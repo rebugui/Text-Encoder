@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 import sys
 from pathlib import Path
+from PyInstaller.utils.hooks import collect_all, collect_data_files, collect_submodules
 
 # Cross-platform paths
 main_script = 'src/main.py'
@@ -12,11 +13,25 @@ if sys.platform == 'win32':
 else:
     icon_path = 'assets/icon.png'
 
+# Collect all customtkinter data and binaries
+customtkinter_datas, customtkinter_binaries, customtkinter_hiddenimports = collect_all('customtkinter')
+
+# Collect pystray
+pystray_datas, pystray_binaries, pystray_hiddenimports = collect_all('pystray')
+
+# Collect pynput
+pynput_datas, pynput_binaries, pynput_hiddenimports = collect_all('pynput')
+
 a = Analysis(
     [main_script],
     pathex=['src'],
-    binaries=[],
-    datas=[(assets_dir, 'assets')],
+    binaries=customtkinter_binaries + pystray_binaries + pynput_binaries,
+    datas=[
+        (assets_dir, 'assets'),
+        *customtkinter_datas,
+        *pystray_datas,
+        *pynput_datas,
+    ],
     hiddenimports=[
         'ui.main_window',
         'ui.system_tray',
@@ -31,7 +46,10 @@ a = Analysis(
         'transformers.special',
         'transformers.special_formats',
         'transformers.ciphers',
-        'utils.transformation_worker'
+        'utils.transformation_worker',
+        *customtkinter_hiddenimports,
+        *pystray_hiddenimports,
+        *pynput_hiddenimports,
     ],
     hookspath=[],
     hooksconfig={},

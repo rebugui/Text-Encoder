@@ -1,3 +1,7 @@
 pyinstaller==6.18.0
 Pillow
 setuptools==75.0.0
+customtkinter==5.2.1
+pynput==1.7.6
+pystray==0.19.5
+pyperclip==1.8.2
