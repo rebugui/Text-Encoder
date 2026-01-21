@@ -2,8 +2,11 @@ name: Build Multi-Platform Executables
 
 on:
   push:
+    branches: [main]
     tags:
       - 'v*'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -14,16 +17,13 @@ jobs:
         include:
           - os: windows-latest
             os_name: windows
-            executable_name: Text-Encoder.exe
-            python_version: '3.13'
+            python_version: '3.12'
           - os: macos-latest
             os_name: macos
-            executable_name: Text-Encoder.app
-            python_version: '3.13'
+            python_version: '3.12'
           - os: ubuntu-latest
             os_name: linux
-            executable_name: Text-Encoder
-            python_version: '3.13'
+            python_version: '3.12'
 
     runs-on: ${{ matrix.os }}
 
@@ -34,7 +34,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: ${{ matrix.python_version }}
         cache: 'pip'
 
     - name: Install dependencies
@@ -63,19 +63,19 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         cd dist
-        7z a -tzip "../Text-Encoder-${{ matrix.os_name }}.zip" "${{ matrix.executable_name }}"
+        7z a -tzip "../Text-Encoder-${{ matrix.os_name }}.zip" "Text Encoder.exe"
 
     - name: Create archive (macOS)
       if: matrix.os == 'macos-latest'
       run: |
         cd dist
-        zip -r "../Text-Encoder-${{ matrix.os_name }}.zip" "${{ matrix.executable_name }}"
+        zip -r "../Text-Encoder-${{ matrix.os_name }}.zip" "Text Encoder"
 
     - name: Create archive (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
         cd dist
-        zip "../Text-Encoder-${{ matrix.os_name }}.zip" "${{ matrix.executable_name }}"
+        zip "../Text-Encoder-${{ matrix.os_name }}.zip" "Text Encoder"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
