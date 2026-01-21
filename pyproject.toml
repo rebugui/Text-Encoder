@@ -1,0 +1,14 @@
+[project]
+name = "text-encoder"
+version = "0.1.0"
+requires-python = ">=3.11"
+description = "확장형 GUI 텍스트 유틸리티 툴 - 80+ 변환 알고리즘 지원"
+authors = [
+    {name = "Your Name"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

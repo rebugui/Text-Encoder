@@ -1,0 +1,104 @@
+name: Build Multi-Platform Executables
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            os_name: windows
+            executable_name: Text-Encoder.exe
+            python_version: '3.13'
+          - os: macos-latest
+            os_name: macos
+            executable_name: Text-Encoder.app
+            python_version: '3.13'
+          - os: ubuntu-latest
+            os_name: linux
+            executable_name: Text-Encoder
+            python_version: '3.13'
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python_version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller==6.18.0
+        pip install -r requirements.txt
+
+    - name: Build with PyInstaller (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        pyinstaller "Text Encoder.spec" --clean
+
+    - name: Build with PyInstaller (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        pyinstaller --onefile --windowed --icon=assets/icon.png --name="Text Encoder" --add-data="assets:assets" src/main.py --clean
+
+    - name: Build with PyInstaller (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxcb-xinerama0 libxcb-cursor0
+        pyinstaller --onefile --windowed --icon=assets/icon.png --name="Text Encoder" --add-data="assets:assets" src/main.py --clean
+
+    - name: Create archive (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        cd dist
+        7z a -tzip "../Text-Encoder-${{ matrix.os_name }}.zip" "${{ matrix.executable_name }}"
+
+    - name: Create archive (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        cd dist
+        zip -r "../Text-Encoder-${{ matrix.os_name }}.zip" "${{ matrix.executable_name }}"
+
+    - name: Create archive (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        cd dist
+        zip "../Text-Encoder-${{ matrix.os_name }}.zip" "${{ matrix.executable_name }}"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Text-Encoder-${{ matrix.os_name }}
+        path: Text-Encoder-${{ matrix.os_name }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: artifacts/*/*.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

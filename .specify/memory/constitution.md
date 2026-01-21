@@ -1,50 +1,190 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+==================
+Version Change: Initial → 1.0.0
+Rationale: Initial constitution establishment for Text Encoder Tool project
 
-## Core Principles
+Modified Principles:
+- N/A (initial version)
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+Added Sections:
+- All sections added in this version
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Removed Sections:
+- N/A
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+Templates Status:
+✅ plan-template.md - Reviewed, Constitution Check section compatible
+✅ spec-template.md - Reviewed, requirements alignment confirmed
+✅ tasks-template.md - Reviewed, task categorization supports workflow principles
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Follow-up TODOs:
+- None
+-->
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+# Text Encoder Tool 헌법
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## 핵심 원칙
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### I. 한국어 문서화 (NON-NEGOTIABLE)
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+모든 프로젝트 문서는 반드시 한국어로 작성되어야 한다.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- `specs/` 디렉토리 하위의 모든 문서(요구사항 정의서, 설계 문서, 계약서 등)는 한국어로 작성
+- 코드 주석은 한국어 또는 영어 사용 가능 (단, 팀 표준에 따름)
+- 사용자 매뉴얼, README 등 최종 사용자 facing 문서는 반드시 한국어
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+**이유**: 프로젝트의 주요 사용자 및 이해관계자가 한국어 사용자이므로, 원활한 의사소통과 문서 접근성을 보장하기 위함
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### II. 단위별 작업 및 Git 워크플로우 (NON-NEGOTIABLE)
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+모든 개발 작업은 명확한 'Task' 또는 'Phase' 단위로 분할하여 진행하며, 각 단위 완료 시 반드시 git commit을 수행해야 한다.
+
+- 각 Task 또는 Phase 완료 후 즉시 commit 수행
+- 커밋 메시지는 작업 내용을 명확하게 요약하여 작성 (한국어 또는 영어)
+- 커밋 전 반드시 아래 선결 조건 충족 필요:
+  1. 작성된 테스트 코드 실행 및 기능 무결성 검증
+  2. `tasks.md` 파일에 현재까지의 작업 진척도 최신화 반영
+
+**이유**: 작업의 추적 가능성 보장, 문제 발생 시 빠른 롤백 지원, 진척도 투명성 확보
+
+### III. 테스트 주도 개발 (NON-NEGOTIABLE)
+
+모든 기능 구현 전에 반드시 테스트 코드를 작성해야 한다.
+
+- 기능 구현 전 테스트 코드 먼저 작성 (Red)
+- 테스트가 실패함을 확인 후 구현 (Green)
+- 구현 완료 후 리팩토링 (Refactor)
+- 모든 변환 기능(인코딩, 디코딩, 해시)은 유닛 테스트 필수
+
+**이유**: 기능의 무결성 보장, 회귀 버그 방지, 코드 신뢰성 확보
+
+### IV. 단일 실행 파일 배포 (크로스플랫폼)
+
+최종 결과물은 각 플랫폼별로 일반 사용자가 설치 없이 실행 가능한 단일 실행 파일이어야 한다.
+
+- **Windows**: 단일 .exe 파일 (PyInstaller로 패키징)
+- **macOS**: 단일 .app 번들 (Intel + Apple Silicon 별도 빌드)
+- **Linux**: 단일 바이너리 (Ubuntu 20.04+, Fedora 35+, Debian 11+)
+- 의존성 라이브러리 모두 내장하여 별도 설치 불필요
+- 실행 파일 크기 최적화 (불필요한 의존성 제거)
+
+**이유**: 사용자 편의성 최우선, 배포 및 설치 과정 간소화, 크로스플랫폼 접근성 확보
+
+### V. 직관적 GUI 설계
+
+GUI는 보안 도구를 잘 모르는 일반 사용자도 쉽게 사용할 수 있어야 한다.
+
+- 입력(Input)과 출력(Output) 텍스트 박스를 명확히 구분
+- 변환 옵션(인코딩/디코딩/해시)을 직관적인 버튼 또는 드롭다운으로 제공
+- 에러 메시지는 사용자 친화적인 한국어로 표시
+- 복사 버튼 등 편의 기능 포함
+
+**이유**: 도구의 접근성 확대, 학습 곡선 최소화
+
+## 기술 제약사항
+
+### 프로그래밍 언어 및 버전
+- Python 3.x 사용 (최신 안정 버전 권장)
+
+### GUI 프레임워크
+- 다음 중 하나 선택 (사용자 환경 및 요구사항 고려):
+  - Tkinter: Python 내장, 별도 설치 불필요, 가벼움
+  - PyQt6: 강력한 기능, 현대적 위젯, 라이선스 고려 필요
+  - PySide6: Qt 공식 바인딩, LGPL 라이선스
+
+### 패키징 도구
+- PyInstaller 사용 (단일 .exe 생성 최적화)
+- 필요시 py2exe 또는 Nuitka 대체 가능
+
+### 지원 인코딩/디코딩 형식
+- Base64 (인코딩/디코딩)
+- URL Encoding (인코딩/디코딩)
+- Hex (인코딩/디코딩)
+- 추가 형식은 요구사항에 따라 확장 가능
+
+### 지원 해시 알고리즘
+- SHA-256
+- MD5
+- SHA-1 (보안 권장하지 않으나 호환성 위해 포함 가능)
+- 추가 알고리즘은 요구사항에 따라 확장 가능
+
+## 개발 워크플로우
+
+### 1. 기획 및 명세 단계
+- 기능 명세서 작성 (specs/ 디렉토리, 한국어)
+- 사용자 시나리오 정의
+- UI/UX 설계
+
+### 2. 설계 단계
+- 기술 스택 결정 (GUI 프레임워크 등)
+- 아키텍처 설계
+- 데이터 모델 정의 (필요시)
+
+### 3. 구현 단계
+- 각 기능별 Task/Phase 분할
+- 테스트 코드 작성 → 구현 순서 준수
+- 각 Task 완료 시 commit (테스트 통과 및 tasks.md 업데이트 후)
+
+### 4. 테스트 단계
+- 모든 유닛 테스트 통과 확인
+- 통합 테스트 수행
+- 사용자 수용 테스트 (가능한 경우)
+
+### 5. 배포 단계
+- PyInstaller로 .exe 빌드
+- 빌드 결과물 실행 테스트
+- 최종 배포
+
+## Definition of Done
+
+각 기능 또는 프로젝트가 완료로 간주되기 위해서는 다음 모든 조건을 충족해야 한다:
+
+1. **문서화 완료**
+   - [ ] `specs/` 내 요구사항 정의서 완료 (한국어)
+   - [ ] `specs/` 내 설계 문서 완료 (한국어)
+   - [ ] `tasks.md`에 모든 단계가 완료됨으로 표시
+
+2. **테스트 완료**
+   - [ ] 모든 변환 기능에 대한 유닛 테스트 작성 완료
+   - [ ] 모든 테스트 통과 (100% 성공률)
+   - [ ] 커밋 전 테스트 실행 및 무결성 검증 완료
+
+3. **구현 완료**
+   - [ ] 모든 필수 기능 구현 완료
+   - [ ] 코드 리팩토링 및 정리 완료
+   - [ ] 사용자 친화적 에러 처리 완료
+
+4. **빌드 및 배포**
+   - [ ] PyInstaller로 단일 .exe 빌드 성공
+   - [ ] 빌드된 .exe 실행 테스트 통과
+   - [ ] 모든 기능이 .exe에서 정상 작동 확인
+
+5. **Git 관리**
+   - [ ] 모든 Task/Phase별 commit 완료
+   - [ ] 커밋 메시지가 명확하고 요약되어 있음
+   - [ ] 불필요한 파일 제거 및 .gitignore 설정 완료
+
+## 거버넌스
+
+### 헌법의 우선순위
+본 헌법은 프로젝트의 모든 다른 개발 관행보다 우선 적용된다. 헌법과 다른 가이드나 문서가 충돌할 경우, 헌법을 따라야 한다.
+
+### 개정 절차
+헌법 개정은 다음 절차를 따라야 한다:
+1. 개정 필요성 및 제안 내용 문서화
+2. 영향 받는 템플릿 및 문서 식별
+3. 개정 내용에 대한 마이그레이션 계획 수립
+4. 버전 번호 업데이트 (시맨틱 버전닝 준수)
+5. 모든 관련 템플릿 및 문서 동기화
+
+### 버전 정책
+- **MAJOR** (X.0.0): 이전 버전과 호환되지 않는 원칙 변경 또는 제거
+- **MINOR** (0.X.0): 새로운 원칙 또는 섹션 추가, 기존 원칙의 중대한 확장
+- **PATCH** (0.0.X): 문구 명확화, 오타 수정, 비의미적 개선
+
+### 준수 검토
+- 모든 Pull Request와 코드 리뷰는 헌법 준수 여부를 확인해야 한다
+- 복잡성이 증가하는 결정은 반드시 정당화되어야 하며, 헌법 원칙(특히 단순성, 단일 배포 등)과 조화되어야 한다
+
+**버전**: 1.0.0 | **제정일**: 2026-01-21 | **최종 수정일**: 2026-01-21
