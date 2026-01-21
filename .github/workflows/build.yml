@@ -45,7 +45,7 @@ jobs:
     - name: Build with PyInstaller (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        pyinstaller "Text Encoder.spec" --clean
+        pyinstaller "Text Encoder.spec" --clean || pyinstaller --onefile --windowed --icon=assets/icon.ico --name="Text Encoder" --add-data="assets;assets" src/main.py --clean
 
     - name: Build with PyInstaller (macOS)
       if: matrix.os == 'macos-latest'
