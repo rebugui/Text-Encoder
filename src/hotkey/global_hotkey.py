@@ -108,8 +108,41 @@ class GlobalHotkey:
             return True
 
         except Exception as e:
-            # Re-raise with more context
-            print(f"Failed to register hotkey '{hotkey}': {str(e)}")
+            error_str = str(e).lower()
+
+            # Platform-specific error messages
+            if self._platform == 'darwin':
+                if 'permission' in error_str or 'denied' in error_str or 'access' in error_str:
+                    print("=" * 60)
+                    print("ERROR: Global hotkey registration failed on macOS")
+                    print("=" * 60)
+                    print("To enable global hotkeys on macOS, you need to grant")
+                    print("Accessibility permissions:")
+                    print()
+                    print("1. Open System Settings > Privacy & Security")
+                    print("2. Go to Accessibility > Accessibility")
+                    print("3. Find your terminal/app and enable it")
+                    print("4. Restart the application")
+                    print("=" * 60)
+                else:
+                    print(f"Failed to register hotkey '{hotkey}': {str(e)}")
+            elif self._platform == 'linux':
+                if 'permission' in error_str or 'denied' in error_str or 'access' in error_str:
+                    print("=" * 60)
+                    print("ERROR: Global hotkey registration failed on Linux")
+                    print("=" * 60)
+                    print("To enable global hotkeys on Linux, you may need to:")
+                    print("1. Grant accessibility permissions in your desktop settings")
+                    print("2. Or run with appropriate AT-SPI bus access")
+                    print()
+                    print("For GNOME: Settings > Accessibility > Assistive Technologies")
+                    print("=" * 60)
+                else:
+                    print(f"Failed to register hotkey '{hotkey}': {str(e)}")
+            else:
+                print(f"Failed to register hotkey '{hotkey}': {str(e)}")
+                print("The hotkey may already be in use by another application.")
+
             return False
 
     def unregister(self) -> bool:

@@ -39,6 +39,7 @@ a = Analysis(
         'ui.content_area',
         'hotkey.global_hotkey',
         'registry',
+        'state.manager',
         'transformers.encoding',
         'transformers.ascii_encoding',
         'transformers.hashing',

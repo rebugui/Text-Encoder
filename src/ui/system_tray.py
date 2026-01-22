@@ -98,7 +98,7 @@ class SystemTray:
 
     def _create_default_icon(self):
         """
-        Create default icon image.
+        Create default icon image with platform-specific font fallback.
 
         Returns:
             PIL Image for icon
@@ -110,12 +110,29 @@ class SystemTray:
         image = Image.new("RGB", (size, size), color="#1f6aa5")
         draw = ImageDraw.Draw(image)
 
-        # Draw "TE" text
-        try:
-            font = ImageFont.truetype("arial.ttf", 36)
-        except:
+        # Platform-specific font fallback
+        fonts_to_try = []
+        if sys.platform == "win32":
+            fonts_to_try = ["arial.ttf", "Arial", "segoeui.ttf"]
+        elif sys.platform == "darwin":
+            fonts_to_try = ["Arial", "Helvetica", "Menlo", "SF Pro Text"]
+        else:  # Linux
+            fonts_to_try = ["DejaVuSans", "FreeSans", "Arial", "LiberationSans", "sans-serif"]
+
+        # Try to load a font
+        font = None
+        for font_name in fonts_to_try:
+            try:
+                font = ImageFont.truetype(font_name, 36)
+                break
+            except (OSError, IOError):
+                continue
+
+        # Fall back to default font if none worked
+        if font is None:
             font = ImageFont.load_default()
 
+        # Draw "TE" text
         text = "TE"
         bbox = draw.textbbox((0, 0), text, font=font)
         text_width = bbox[2] - bbox[0]

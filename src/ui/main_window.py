@@ -45,10 +45,9 @@ class MainWindow(ctk.CTk):
         ctk.set_appearance_mode("Dark")
         ctk.set_default_color_theme("dark-blue")
 
-        # Set window icon (try multiple methods for better compatibility)
-        icon_path = self._get_window_icon_path()
-        print(f"Icon path: {icon_path}, exists: {icon_path.exists() if icon_path else False}")
-        if icon_path and icon_path.exists():
+        # Set window icon with unified method
+        icon_path = self._get_icon_path()
+        if icon_path:
             self._set_window_icon(icon_path)
         else:
             print("Warning: Icon file not found, skipping window icon setup")
@@ -97,7 +96,7 @@ class MainWindow(ctk.CTk):
 
     def _set_window_icon(self, icon_path: Path):
         """
-        Set window icon using multiple methods for better Windows compatibility.
+        Set window icon with cross-platform support.
 
         Args:
             icon_path: Path to icon file
@@ -106,106 +105,44 @@ class MainWindow(ctk.CTk):
 
         # Convert to absolute path
         abs_icon_path = str(icon_path.absolute())
-        print(f"Setting window icon (absolute): {abs_icon_path}")
 
         if sys.platform == "win32":
+            # Windows: use both methods for better compatibility
             try:
-                # Method 1: iconbitmap with absolute path (standard method)
                 self.iconbitmap(abs_icon_path)
-                print(f"✓ iconbitmap() succeeded")
-
-                # Method 2: wm_iconbitmap with absolute path
-                try:
-                    self.wm_iconbitmap(abs_icon_path)
-                    print(f"✓ wm_iconbitmap() succeeded")
-                except Exception as e:
-                    print(f"✗ wm_iconbitmap() failed: {e}")
-
-                # Method 3: Set again after window is fully initialized
-                def set_icon_delayed():
-                    try:
-                        self.iconbitmap(abs_icon_path)
-                        self.wm_iconbitmap(abs_icon_path)
-                        print(f"✓ Delayed icon set succeeded")
-                    except Exception as e:
-                        print(f"✗ Delayed icon set failed: {e}")
-
-                self.after(100, set_icon_delayed)
-
+                self.wm_iconbitmap(abs_icon_path)
             except Exception as e:
-                print(f"✗ Failed to set window icon: {e}")
+                print(f"Failed to set window icon: {e}")
         else:
-            # For non-Windows platforms
+            # macOS/Linux
             try:
                 self.iconbitmap(abs_icon_path)
-                print(f"✓ Icon set for non-Windows platform")
             except Exception as e:
-                print(f"✗ Failed to set window icon: {e}")
-
-    def _get_window_icon_path(self) -> Optional[Path]:
-        """
-        Get icon path for window title bar and taskbar.
-
-        Returns:
-            Path to icon file or None
-        """
-        # Get assets directory - try multiple methods
-        import sys
-
-        # Method 1: Relative to script location
-        try:
-            script_dir = Path(__file__).parent.parent.parent  # Go up from src/ui to project root
-            icon_file = script_dir / "assets" / "icon.ico"
-            if icon_file.exists():
-                print(f"Found icon via script dir: {icon_file}")
-                return icon_file
-        except Exception as e:
-            print(f"Method 1 failed: {e}")
-
-        # Method 2: Current working directory
-        try:
-            cwd = Path.cwd()
-            icon_file = cwd / "assets" / "icon.ico"
-            if icon_file.exists():
-                print(f"Found icon via CWD: {icon_file}")
-                return icon_file
-        except Exception as e:
-            print(f"Method 2 failed: {e}")
-
-        # Method 3: Relative to current directory
-        try:
-            icon_file = Path("assets/icon.ico")
-            if icon_file.exists():
-                print(f"Found icon via relative: {icon_file.absolute()}")
-                return icon_file
-        except Exception as e:
-            print(f"Method 3 failed: {e}")
-
-        print("Could not find icon.ico file")
-        return None
+                print(f"Failed to set window icon: {e}")
 
     def _get_icon_path(self) -> Optional[Path]:
         """
-        Get platform-specific icon path.
+        Get platform-specific icon path with unified approach.
 
         Returns:
             Path to icon file or None
         """
-        # Get assets directory
-        if getattr(__import__('sys'), 'frozen', False):
-            # Running as compiled executable
-            assets_dir = Path(__import__('sys').executable).parent / "assets"
+        import sys
+
+        # Determine base directory
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            # Running as PyInstaller executable
+            base_dir = Path(sys._MEIPASS)
         else:
-            # Running as script
-            assets_dir = Path(__file__).parent.parent.parent / "assets"
+            # Running as script - go up from src/ui to project root
+            base_dir = Path(__file__).parent.parent.parent
 
         # Platform-specific icon file
-        import sys
         if sys.platform == "win32":
-            icon_file = assets_dir / "icon.ico"
+            icon_file = base_dir / "assets" / "icon.ico"
         else:
             # macOS and Linux
-            icon_file = assets_dir / "icon.png"
+            icon_file = base_dir / "assets" / "icon.png"
 
         return icon_file if icon_file.exists() else None
 

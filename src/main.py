@@ -198,13 +198,23 @@ def main():
     global_hotkey = GlobalHotkey()
 
     def on_hotkey_activated():
-        """Handle global hotkey activation."""
-        # Bring window to front and focus
-        app.deiconify()  # Show if hidden
-        app.lift()  # Bring to front
-        app.focus()  # Give focus
-        # Print notification to console
-        print("Global hotkey activated! Window focused.")
+        """Handle global hotkey activation - toggle window visibility."""
+        # Check if window is currently visible
+        if app.state() == 'withdrawn':
+            # Window is hidden, show it
+            app.deiconify()  # Show window
+            app.lift()  # Bring to front
+            app.focus()  # Give focus
+            print("Global hotkey activated! Window shown.")
+        else:
+            # Window is visible, hide it
+            app.withdraw()  # Hide window (minimize to tray)
+            if system_tray and system_tray.is_available():
+                system_tray.show_message(
+                    "Text Encoder",
+                    "Window hidden. Press hotkey again or click tray icon to show."
+                )
+            print("Global hotkey activated! Window hidden.")
 
     # Connect signal to handler
     global_hotkey.hotkey_activated.connect(on_hotkey_activated)
@@ -214,6 +224,7 @@ def main():
         if global_hotkey.register():
             hotkey_name = "Cmd+Alt+T" if sys.platform == 'darwin' else "Ctrl+Alt+T"
             print(f"Global hotkey registered: {hotkey_name}")
+            print(f"Press {hotkey_name} to toggle window visibility (show/hide)")
         else:
             print("Failed to register global hotkey")
     except Exception as e:
